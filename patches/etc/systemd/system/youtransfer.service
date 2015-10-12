@@ -1,0 +1,13 @@
+[Unit]
+Description=The simple but elegant self-hosted file transfer & sharing solution
+Documentation=http://www.youtransfer.io/
+After=network.target
+
+[Service]
+WorkingDirectory=/opt/youtransfer
+ExecStart=/usr/bin/npm start
+Restart=on-failure
+RestartSec=2s
+
+[Install]
+WantedBy=multi-user.target
