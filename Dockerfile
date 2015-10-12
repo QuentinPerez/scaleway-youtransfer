@@ -1,5 +1,5 @@
 ## -*- docker-image-name: "scaleway/youtransfer:latest" -*-
-FROM scaleway/ubuntu:vivid
+FROM scaleway/ubuntu:trusty
 MAINTAINER Scaleway <opensource@scaleway.com> (@scaleway)
 
 # Prepare rootfs for image-builder
@@ -14,23 +14,19 @@ RUN apt-get update \
       build-essential \
       git \
  && curl -sL https://deb.nodesource.com/setup_0.12 | bash - \
- && apt-get install -y nodejs
+ && apt-get install -y nodejs \
+ && apt-get clean
 
-RUN mkdir -p /opt/youtransfer/config
-RUN mkdir -p /opt/youtransfer/uploads
+RUN mkdir -p /opt/youtransfer/config /opt/youtransfer/uploads
 WORKDIR /opt/youtransfer/
-RUN npm install youtransfer -g
-RUN /usr/lib/node_modules/youtransfer/bin/youtransfer init
-RUN npm install
+RUN npm install youtransfer -g \
+ && /usr/lib/node_modules/youtransfer/bin/youtransfer init \
+ && npm install
 
-ADD ./patches/config.json /opt/youtransfer/
 ADD ./patches/etc /etc
+ADD ./patches/opt /opt
 
-RUN systemctl enable youtransfer
-
-# Clean APT cache for a lighter image.
-RUN apt-get clean \
- && rm -fr /var/lib/{apt,dpkg,cache,log}
+RUN update-rc.d youtransfer defaults
 
 
 # Clean rootfs from image-builder
